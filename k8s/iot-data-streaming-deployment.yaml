@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iot-data-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iot-data-streaming
+  template:
+    metadata:
+      labels:
+        app: iot-data-streaming
+    spec:
+      containers:
+      - name: iot-data-streaming
+        image: airflow/iot_data_streaming:latest
+        ports:
+        - containerPort: 5000  # Assuming it uses port 5000, update if different
+        env:
+        - name: KAFKA_BROKER
+          value: kafka:9092
+        - name: SPARK_MASTER
+          value: spark://spark-master:7077
+        - name: POSTGRES_HOST
+          value: postgres
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres

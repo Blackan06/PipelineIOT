@@ -1,0 +1,105 @@
+version: "3.1"
+services:
+  webserver:
+    networks:
+      - bigdata-network
+   
+
+  scheduler:
+    networks:
+      - bigdata-network
+
+  triggerer:
+    networks:
+      - bigdata-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:  
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092  
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - bigdata-network
+
+  kafdrop:
+      image: obsidiandynamics/kafdrop
+      container_name: kafdrop
+      ports:
+        - "9001:9000"
+      environment:
+        KAFKA_BROKERCONNECT: "kafka:9092"
+      depends_on:
+        - kafka
+      networks:
+        - bigdata-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2182:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - bigdata-network
+      
+  spark-master:
+    image: airflow/spark-master
+    build: ./spark/master
+    container_name: spark-master
+    ports:
+      - "7077:7077"
+      - "8082:8080"
+      - "4040:4040"
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+    networks:
+      - bigdata-network
+    
+
+  spark-worker:
+    image: airflow/spark-worker
+    build: ./spark/worker
+    container_name: spark-worker
+    user: root
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    networks:
+      - bigdata-network
+  docker-proxy:
+    image: alpine/socat
+    command: "TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock"
+    ports:
+      - "2375:2375"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - bigdata-network
+  
+  postgres:
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - bigdata-network
+    
+    
+
+networks:
+  bigdata-network:
+    driver: bridge
+volumes:
+  jenkins_home:
