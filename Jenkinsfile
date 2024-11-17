@@ -10,6 +10,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                script {
+                    deleteDir() // Dọn dẹp toàn bộ thư mục trước khi checkout
+                }
                 // Lấy mã nguồn từ Git repository 
                 git branch: 'main', url: 'https://github.com/Blackan06/PipelineIOT.git' // Thay URL bằng repository của bạn
             }
