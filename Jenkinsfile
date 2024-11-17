@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Lấy mã nguồn từ Git repository
+                // Lấy mã nguồn từ Git repository 
                 git branch: 'main', url: 'https://github.com/Blackan06/PipelineIOT.git' // Thay URL bằng repository của bạn
             }
         }
