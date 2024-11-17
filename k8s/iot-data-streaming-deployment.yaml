@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: iot-data-streaming
+  name: iot_stream_analysis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: iot-data-streaming
+      app: iot_stream_analysis
   template:
     metadata:
       labels:
-        app: iot-data-streaming
+        app: iot_stream_analysis
     spec:
       containers:
-      - name: iot-data-streaming
-        image: airflow/iot_data_streaming:latest
+      - name: iot_stream_analysis
+        image: airflow/iot_stream_analysis:latest
         ports:
         - containerPort: 5000  # Assuming it uses port 5000, update if different
         env:

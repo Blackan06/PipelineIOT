@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Lấy mã nguồn từ Git repository
-                git branch: 'main', url: 'https://github.com/your-repo-url' // Thay URL bằng repository của bạn
+                git branch: 'main', url: 'https://github.com/Blackan06/PipelineIOT.git' // Thay URL bằng repository của bạn
             }
         }
 
@@ -22,6 +22,8 @@ pipeline {
                     docker.withRegistry('', DOCKER_HUB_CREDENTIALS) {
                         // Build tất cả các images trong Docker Compose
                         sh "docker-compose -f docker-compose.override.yml build"
+                        sh "docker build -t ${DOCKER_REPO}/iot_stream_analysis ./spark/notebooks/"
+
                     }
                 }
             }
@@ -37,7 +39,7 @@ pipeline {
                         sh "docker push ${DOCKER_REPO}/scheduler"
                         sh "docker push ${DOCKER_REPO}/spark-master"
                         sh "docker push ${DOCKER_REPO}/spark-worker"
-                        sh "docker push ${DOCKER_REPO}/iot_data_streaming"
+                        sh "docker push ${DOCKER_REPO}/iot_stream_analysis"
                     }
                 }
             }
