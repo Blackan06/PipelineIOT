@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // Docker Hub credentials
+        // Thông tin đăng nhập Docker Hub
         KUBECONFIG_CREDENTIALS = credentials('kubeconfig-file') // Thay 'kubeconfig-file' bằng ID của kubeconfig
         DOCKER_REPO = 'kiet020898' // Repository trên Docker Hub của bạn
     }
@@ -11,11 +11,9 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    deleteDir() 
-                    checkout scm// Dọn dẹp toàn bộ thư mục trước khi checkout
+                    deleteDir() // Xóa toàn bộ thư mục trước khi checkout
+                    checkout scm // Sử dụng scm checkout để lấy mã nguồn từ Git repository
                 }
-                // Lấy mã nguồn từ Git repository 
-                git branch: 'main', url: 'https://github.com/Blackan06/PipelineIOT.git' // Thay URL bằng repository của bạn
             }
         }
 
@@ -23,12 +21,12 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
-                        // Đăng nhập Docker Hub an toàn
+                        // Đăng nhập vào Docker Hub an toàn
                         sh '''
                             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
                         '''
                         
-                        // Build tất cả các images trong Docker Compose
+                        // Build tất cả các images từ Docker Compose
                         sh "docker-compose -f docker-compose.override.yml build"
                         sh "docker build -t ${DOCKER_REPO}/iot_stream_analysis ./spark/notebooks/"
                     }
@@ -40,7 +38,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
-                        // Đăng nhập Docker Hub để đẩy images
+                        // Đăng nhập vào Docker Hub để đẩy images
                         sh '''
                             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
                         '''
@@ -59,7 +57,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
-                    // Triển khai tất cả các file YAML trong thư mục k8s lên Kubernetes
+                    // Triển khai các file YAML lên Kubernetes
                     sh 'kubectl --kubeconfig=$KUBECONFIG apply -f k8s/'
                 }
             }
@@ -68,7 +66,7 @@ pipeline {
 
     post {
         always {
-            cleanWs() // Clean workspace của Jenkins để tiết kiệm dung lượng
+            cleanWs() // Dọn dẹp workspace của Jenkins
         }
     }
 }
