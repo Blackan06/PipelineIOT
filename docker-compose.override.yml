@@ -87,9 +87,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - bigdata-network
-  
-  
-    
   jenkins:
     image: jenkins
     build: ./Jenkins
@@ -97,11 +94,11 @@ services:
     user: root
     privileged: true
     ports:
-      - "8088:8080"    # Cổng mặc định của Jenkins
-      - "50000:50000"  # Cổng cho các agent Jenkins kết nối
+      - "8088:8080"   
+      - "50000:50000" 
     environment:
-      JENKINS_ADMIN_ID: admin  # Thay bằng tên người dùng admin của bạn
-      JENKINS_ADMIN_PASSWORD: admin  # Thay bằng mật khẩu admin của bạn
+      JENKINS_ADMIN_ID: admin  
+      JENKINS_ADMIN_PASSWORD: admin  
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
