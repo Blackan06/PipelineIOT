@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        // Thông tin đăng nhập Docker Hub
-        KUBECONFIG_CREDENTIALS = credentials('kubeconfig-file') // Thay 'kubeconfig-file' bằng ID của kubeconfig
-        DOCKER_REPO = 'kiet020898' // Repository trên Docker Hub của bạn
+        KUBECONFIG_CREDENTIALS = credentials('kubeconfig-file')
+        DOCKER_REPO = 'kiet020898'
+        DOCKER_HOST = 'tcp://docker-proxy:2375' // Kết nối Docker qua proxy
     }
 
     stages {
@@ -13,6 +13,14 @@ pipeline {
                 script {
                     deleteDir() // Xóa toàn bộ thư mục trước khi checkout
                     checkout scm // Sử dụng scm checkout để lấy mã nguồn từ Git repository
+                }
+            }
+        }
+
+        stage('Check Docker') {
+            steps {
+                script {
+                    sh 'docker info' // Kiểm tra Docker daemon có sẵn
                 }
             }
         }
