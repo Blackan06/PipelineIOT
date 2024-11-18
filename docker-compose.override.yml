@@ -97,9 +97,11 @@ services:
       - bigdata-network
     
   jenkins:
-    image: jenkins/jenkins:lts
+    image: jenkins
+    build: ./Jenkins
     container_name: jenkins
     user: root
+    privileged: true
     ports:
       - "8088:8080"    # Cổng mặc định của Jenkins
       - "50000:50000"  # Cổng cho các agent Jenkins kết nối
