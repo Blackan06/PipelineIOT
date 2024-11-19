@@ -1,8 +1,14 @@
 version: "3.1"
 services:
   webserver:
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - bigdata-network
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@postgres:5432/iot_data
+
    
 
   scheduler:
@@ -78,6 +84,7 @@ services:
       - SPARK_MASTER=spark://spark-master:7077
     networks:
       - bigdata-network
+
   docker-proxy:
     image: alpine/socat
     command: "TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock"
@@ -88,19 +95,7 @@ services:
     networks:
       - bigdata-network
   
-  postgres:
-    image: postgres:13  # Thêm image
-    container_name: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: iot_data
-    ports:  # Thêm port mapping
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - bigdata-network
+  
     
   jenkins:
     image: jenkins
@@ -120,6 +115,24 @@ services:
       - /usr/bin/docker:/usr/bin/docker
     networks:
       - bigdata-network
+
+  postgres:
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: iot_data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    networks:
+      - bigdata-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 networks:
   bigdata-network:
