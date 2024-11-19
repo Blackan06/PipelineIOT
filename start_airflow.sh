@@ -10,7 +10,7 @@ echo "PostgreSQL đã sẵn sàng."
 
 # Khởi tạo cơ sở dữ liệu cho Airflow (nếu cần thiết)
 echo "Khởi tạo database cho Airflow..."
-airflow db init
+airflow db migrate
 
 # Khởi động Airflow webserver
 echo "Khởi động Airflow webserver..."
