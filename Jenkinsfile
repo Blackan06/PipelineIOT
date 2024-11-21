@@ -24,64 +24,7 @@ pipeline {
                 }
             }
         }
-        stage('Setup') {
-            steps {
-                script {
-                    // Kiểm tra và cài đặt Astro CLI
-                    sh '''
-                        curl -fsSL https://install.astronomer.io | bash
-                        astro version
-                    '''
-                }
-            }
-        }
-        stage('Start Astro Development Environment') {
-            steps {
-                script {
-                    sh '''
-                        echo "Starting Astro Development Environment..."
-                        astro dev start --wait 4m
-                    '''
-                }
-            }
-        }
-        stage('Build Docker Images with Docker Compose') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        // Đăng nhập vào Docker Hub an toàn
-                        sh '''
-                            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-                        '''
-                        
-                        // Build tất cả các images từ Docker Compose
-                        sh "docker build -t ${DOCKER_REPO}/iot_stream_analysis ./spark/notebooks/"
-                        sh "docker build -t ${DOCKER_REPO}/kafka_producer ./kafka/producer/"
-                        sh "docker build -t ${DOCKER_REPO}/kafka_consumer ./kafka/consumer/"
-                    }
-                }
-            }
-        }
-
-        stage('Push Docker Images') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        // Đăng nhập vào Docker Hub để đẩy images
-                        sh '''
-                            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-                        '''
-                        
-                        // Push tất cả các images lên Docker Hub
-                       
-                        sh "docker push ${DOCKER_REPO}/iot_stream_analysis"
-                        sh "docker push ${DOCKER_REPO}/kafka_producer"
-                        sh "docker push ${DOCKER_REPO}/kafka_consumer"
-                    }
-                }
-            }
-        }
-
+        
         stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig-file', variable: 'KUBECONFIG')]) {
