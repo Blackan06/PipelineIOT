@@ -27,7 +27,7 @@ pipeline {
 
         stage('Build Docker Images with Docker Compose') {
             steps {
-                withCredentials([usernamePassword(credentialsId: '≈≈', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
                         // Đăng nhập vào Docker Hub an toàn
                         sh '''
@@ -37,6 +37,8 @@ pipeline {
                         // Build tất cả các images từ Docker Compose
                         sh "docker compose -f docker-compose.override.yml build"
                         sh "docker build -t ${DOCKER_REPO}/iot_stream_analysis ./spark/notebooks/"
+                        sh "docker build -t ${DOCKER_REPO}/kafka_producer ./kafka/producer/"
+                        sh "docker build -t ${DOCKER_REPO}/kafka_consumer ./kafka/consumer/"
                     }
                 }
             }
