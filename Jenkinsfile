@@ -35,7 +35,7 @@ pipeline {
                         '''
                         
                         // Build tất cả các images từ Docker Compose
-                        sh "docker-compose -f docker-compose.override.yml build"
+                        sh "docker compose -f docker-compose.override.yml build"
                         sh "docker build -t ${DOCKER_REPO}/iot_stream_analysis ./spark/notebooks/"
                     }
                 }
