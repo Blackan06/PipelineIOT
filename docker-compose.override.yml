@@ -6,12 +6,6 @@ services:
         condition: service_healthy
     networks:
       - bigdata-network
-    environment:
-    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:postgres@postgres:5432/iot_data
-    - AIRFLOW__WEBSERVER__WEB_SERVER_HOST=0.0.0.0
-
-   
-
   scheduler:
     networks:
       - bigdata-network
@@ -125,7 +119,6 @@ services:
       POSTGRES_DB: iot_data
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
     networks:
       - bigdata-network
