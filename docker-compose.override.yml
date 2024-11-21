@@ -107,7 +107,6 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
     networks:
       - bigdata-network
 
@@ -116,7 +115,6 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: iot_data
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

@@ -27,7 +27,7 @@ pipeline {
 
         stage('Build Docker Images with Docker Compose') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: '≈≈', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
                         // Đăng nhập vào Docker Hub an toàn
                         sh '''
